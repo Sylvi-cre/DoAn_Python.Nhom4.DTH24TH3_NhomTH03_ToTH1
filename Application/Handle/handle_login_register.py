@@ -2,13 +2,12 @@ from .db_connect import connect_to_db
 from tkinter import messagebox
 from Application.UI import librarian_ui, readers_ui
 import pyodbc
-<<<<<<< HEAD
+
 import bcrypt
 
-def handle_register(txtHoTen, txtUsername, txtSDT, txtPassword):
-=======
+
 def handle_register(txtHoTen, txtUsername, txtSDT, txtPassword, txtLibarianCode):
->>>>>>> bbdaaaf7e8b0aea20c13f66f85330e3d382e09ae
+
     """
     Xử lý logic đăng ký người dùng, lấy dữ liệu từ các đối tượng Entry Tkinter
     và lưu vào CSDL.
@@ -28,7 +27,7 @@ def handle_register(txtHoTen, txtUsername, txtSDT, txtPassword, txtLibarianCode)
     conn = connect_to_db() 
     if conn is None:
         # Hàm connect_to_db() của bạn đã in lỗi, nên chỉ cần thoát
-        return
+        return 
     
     try:
         cursor = conn.cursor()
@@ -39,31 +38,26 @@ def handle_register(txtHoTen, txtUsername, txtSDT, txtPassword, txtLibarianCode)
             messagebox.showerror("Lỗi", "Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác.")
             return
 
-<<<<<<< HEAD
         # 3. Mã hóa mật khẩu
         password_temp = password.encode('utf-8')
         hash_password  = bcrypt.hashpw(password_temp, bcrypt.gensalt())
         hash_password_temp = hash_password.decode('utf-8')
 
-
-
         # 4. Thêm người dùng mới (Mặc định User_Role là 'User')
-=======
-        # 3. Thêm người dùng mới
         if role == "AGU_LIB":
             user_role = 1  # Thủ thư
         else:
             user_role = 0  # Đọc giả
->>>>>>> bbdaaaf7e8b0aea20c13f66f85330e3d382e09ae
+
         insert_query = """
         INSERT INTO NGUOIDUNG (HoTen, _Username, _Password, SDT, User_Role)
         VALUES (?, ?, ?, ?, ?) 
         """
-<<<<<<< HEAD
+
         cursor.execute(insert_query, (ho_ten, username, hash_password_temp, sdt))
-=======
+
         cursor.execute(insert_query, (ho_ten, username, password, sdt, user_role))
->>>>>>> bbdaaaf7e8b0aea20c13f66f85330e3d382e09ae
+
         conn.commit()
 
         messagebox.showinfo("Thành công", "Đăng ký thành công!")
