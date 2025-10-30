@@ -54,9 +54,7 @@ def handle_register(txtHoTen, txtUsername, txtSDT, txtPassword, txtLibarianCode)
         VALUES (?, ?, ?, ?, ?) 
         """
 
-        cursor.execute(insert_query, (ho_ten, username, hash_password_temp, sdt))
-
-        cursor.execute(insert_query, (ho_ten, username, password, sdt, user_role))
+        cursor.execute(insert_query, (ho_ten, username, hash_password_temp, sdt, user_role))
 
         conn.commit()
 
@@ -106,21 +104,29 @@ def handle_login(txtUsername, txtPassword):
         cursor = conn.cursor()
 
         # 2. Kiểm tra Tên đăng nhập và Mật khẩu (SỬ DỤNG TÊN CỘT CHÍNH XÁC: _Username, _Password)
-        cursor.execute("SELECT ID_user, HoTen, User_Role FROM NGUOIDUNG WHERE _Username = ? AND _Password = ?", (username, password))
+        cursor.execute("SELECT ID_user, HoTen, _Password, User_Role FROM NGUOIDUNG WHERE _Username = ?", (username,))
         user = cursor.fetchone()
         if user:
-            user_id, ho_ten, tempuser_role = user
-            if tempuser_role == 1:
-                user_role = 'Thủ thư'
-            else:
-                user_role = 'Đọc giả'
-            messagebox.showinfo("Thành công", f"Đăng nhập thành công!\nChào mừng {ho_ten} (ID: {user_id}, Role: {user_role})")
-            # Ở đây bạn có thể chuyển đến giao diện chính của ứng dụng
-            if tempuser_role == 1:
-                librarian_ui.librarian_ui()
-            else:
-                readers_ui.reader_ui()
+            user_id, ho_ten, hashed_password, tempuser_role = user
+            # 3. Kiểm tra mật khẩu nhập vào có khớp với hash không
+            password_bytes = password.encode('utf-8')
+            hashed_bytes = hashed_password.encode('utf-8')
 
+            if bcrypt.checkpw(password_bytes, hashed_bytes):
+
+                # đăng nhập thành công
+                if tempuser_role == 1:
+                    user_role = 'Thủ thư'
+                else:
+                    user_role = 'Đọc giả'
+                messagebox.showinfo("Thành công", f"Đăng nhập thành công!\nChào mừng {ho_ten} (ID: {user_id}, Role: {user_role})")
+                # Ở đây bạn có thể chuyển đến giao diện chính của ứng dụng
+                if tempuser_role == 1:
+                 librarian_ui.librarian_ui()
+                else:
+                    readers_ui.reader_ui()
+            else:
+                messagebox.showerror("Lỗi", "Tên đăng nhập hoặc mật khẩu không đúng.")
         else:
             messagebox.showerror("Lỗi", "Tên đăng nhập hoặc mật khẩu không đúng.")
             return
